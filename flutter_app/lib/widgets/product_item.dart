@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_app/providers/cart.dart';
 import 'package:flutter_app/providers/product.dart';
 import 'package:flutter_app/screens/product_detail_screen.dart';
 import 'package:provider/provider.dart';
@@ -8,19 +7,22 @@ import 'package:provider/provider.dart';
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    final product = Provider.of<Product>(context, listen: false);
+    final cartItems = Provider.of<Cart>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          leading: IconButton(
-            icon: Icon(
-                product.isFavourite ? Icons.favorite : Icons.favorite_border),
-            onPressed: () {
-              product.toggleFavouriteStatus();
-            },
-            color: Theme.of(context).colorScheme.secondary,
+          leading: Consumer<Product>(
+            builder: (_, value, child) => IconButton(
+              icon: Icon(
+                  product.isFavourite ? Icons.favorite : Icons.favorite_border),
+              onPressed: () {
+                product.toggleFavouriteStatus();
+              },
+              color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
           title: Text(
             product.title,
@@ -30,7 +32,9 @@ class ProductItem extends StatelessWidget {
             icon: const Icon(
               Icons.shopping_cart,
             ),
-            onPressed: () {},
+            onPressed: () {
+              cartItems.addItem(product.id, product.price, product.title);
+            },
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),
